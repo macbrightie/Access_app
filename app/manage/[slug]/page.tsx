@@ -404,12 +404,12 @@ export default function ManageFilePage() {
                             <Image src="/icons/link.svg" alt="" width={16} height={16} className="opacity-50" />
                         </div>
 
-                        <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 h-12 bg-white focus-within:ring-1 focus-within:ring-black transition-all">
-                            <span className="text-sm text-gray-500 mr-2">onlyaccessme.vercel.app/</span>
+                        <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 h-12 bg-white focus-within:ring-1 focus-within:ring-black transition-all overflow-hidden min-w-0">
+                            <span className="text-sm text-gray-500 mr-1 shrink-0">onlyaccessme.vercel.app/</span>
                             <input
                                 value={editLinkSlug}
                                 onChange={(e) => setEditLinkSlug(e.target.value)}
-                                className="flex-1 outline-none text-sm font-medium text-black bg-transparent"
+                                className="flex-1 outline-none text-sm font-medium text-black bg-transparent min-w-[50px]"
                             />
                         </div>
                     </div>

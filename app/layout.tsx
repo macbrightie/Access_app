@@ -61,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${texGyre.variable} ${bakemono.variable} font-sans antialiased h-screen flex flex-col bg-[#FAFAFA] overflow-hidden`}
+        className={`${inter.variable} ${texGyre.variable} ${bakemono.variable} font-sans antialiased h-screen flex flex-col bg-[#FAFAFA] overflow-y-auto overflow-x-hidden`}
       >
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center p-4 pt-20">

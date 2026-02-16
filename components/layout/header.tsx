@@ -34,7 +34,7 @@ export function Header() {
                 </Link>
                 <Button
                     variant="outline"
-                    className="rounded-full gap-2 text-sm font-normal px-4 py-2 border-gray-200 shadow-sm hover:bg-gray-50 bg-white"
+                    className="hidden md:flex rounded-full gap-2 text-sm font-normal px-4 py-2 border-gray-200 shadow-sm hover:bg-gray-50 bg-white"
                     onClick={() => setShowToast(true)}
                 >
                     <Image src="/icons/Chrome.svg" alt="" width={16} height={16} className="w-4 h-4" />

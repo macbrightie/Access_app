@@ -236,14 +236,14 @@ Access Team`
                     </div>
 
                     {/* 2. Public Link Pill - Updated Design */}
-                    <div className="flex items-center gap-3 bg-white rounded-full border border-gray-100 p-1 pl-4 pr-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] w-auto min-w-[320px]">
-                        <div className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-full">
+                    <div className="flex items-center gap-3 bg-white rounded-full border border-gray-100 p-1 pl-4 pr-1 shadow-[0_2px_8px_rgba(0,0,0,0.04)] w-full max-w-md mx-auto">
+                        <div className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-full shrink-0">
                             <Image src="/icons/link.svg" alt="" width={14} height={14} className="opacity-50" />
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-black font-medium text-lg tracking-tight">
-                            <span className="opacity-40 font-normal">onlyaccessme.vercel.app/</span>
-                            <span className="bg-gray-100 px-1.5 py-0.5 rounded-md">{successData.slug}</span>
+                        <div className="flex items-center gap-1.5 text-black font-medium text-base md:text-lg tracking-tight overflow-hidden">
+                            <span className="opacity-40 font-normal shrink-0">onlyaccessme.vercel.app/</span>
+                            <span className="bg-gray-100 px-1.5 py-0.5 rounded-md truncate">{successData.slug}</span>
                         </div>
 
                         <div className="ml-auto pl-2">
