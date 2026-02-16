@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    @font-face {
+      font-family: 'TexGyre';
+      src: url('fonts/texgyreadventor-regular.otf') format('opentype');
+    }
+    body {
+      width: 250px;
+      font-family: 'TexGyre', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background-color: #FAFAFA;
+      color: #000;
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px 0;
+      font-weight: 400;
+      text-align: center;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 10px 0;
+      margin-bottom: 8px;
+      background-color: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      color: #000;
+      text-align: center;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #f9fafb;
+      border-color: #d1d5db;
+    }
+    .btn-primary {
+      background-color: #000;
+      color: #fff;
+      border: 1px solid #000;
+    }
+    .btn-primary:hover {
+      background-color: #1f2937;
+      border-color: #1f2937;
+    }
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 10px;
+      color: #6b7280;
+    }
+    .icon-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+    .icon-container img {
+      width: 32px;
+      height: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="icon-container">
+    <img src="icons/logo.svg" alt="Access Logo">
+  </div>
+  <h1>Access</h1>
+  
+  <button id="upload-btn" class="btn btn-primary">Upload New File</button>
+  <button id="manage-btn" class="btn">Manage Files</button>
+
+  <div class="footer">
+    Created by Brightmac
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
