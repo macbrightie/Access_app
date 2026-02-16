@@ -378,7 +378,7 @@ Access Team`
                         </div>
 
                         {/* Domain Text */}
-                        <span className="text-sm font-medium text-gray-900">onlyaccessme.vercel.app/</span>
+                        <span className="text-sm font-medium text-gray-900 truncate max-w-[120px] md:max-w-none">onlyaccessme.vercel.app/</span>
 
                         {/* Edit Link Input */}
                         <div className="relative">

@@ -405,7 +405,7 @@ export default function ManageFilePage() {
                         </div>
 
                         <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 h-12 bg-white focus-within:ring-1 focus-within:ring-black transition-all overflow-hidden min-w-0">
-                            <span className="text-sm text-gray-500 mr-1 shrink-0">onlyaccessme.vercel.app/</span>
+                            <span className="text-sm text-gray-500 mr-1 shrink-0 truncate max-w-[120px] md:max-w-none">onlyaccessme.vercel.app/</span>
                             <input
                                 value={editLinkSlug}
                                 onChange={(e) => setEditLinkSlug(e.target.value)}
