@@ -269,7 +269,7 @@ Access Team`
                         </div>
 
                         <div className="bg-[#111] rounded-xl p-6 border border-[#333] relative group">
-                            <code className="text-[#ccff00] text-xs font-mono tracking-wide break-all whitespace-normal">
+                            <code className="text-[#ccff00] text-sm font-bakemono tracking-wide break-all whitespace-normal">
                                 {successData.edit_token}
                             </code>
                         </div>

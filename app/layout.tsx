@@ -33,6 +33,18 @@ const texGyre = localFont({
   variable: "--font-tex-gyre",
 });
 
+const bakemono = localFont({
+  src: [
+    {
+      path: '../public/font/Bakemono-Stereo-Bold-trial.ttf',
+      weight: '700',
+      style: 'normal',
+    },
+    // Add other weights if needed, but user specified Bold
+  ],
+  variable: "--font-bakemono",
+});
+
 export const metadata: Metadata = {
   title: "Access - File Sharing",
   description: "Upload your file and get your link in return.",
@@ -49,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${texGyre.variable} font-sans antialiased h-screen flex flex-col bg-[#FAFAFA] overflow-hidden`}
+        className={`${inter.variable} ${texGyre.variable} ${bakemono.variable} font-sans antialiased h-screen flex flex-col bg-[#FAFAFA] overflow-hidden`}
       >
         <Header />
         <main className="flex-1 flex flex-col items-center justify-center p-4 pt-20">

@@ -326,7 +326,7 @@ export default function ManageFilePage() {
                         <AccordionContent className="pb-6 space-y-4">
                             {/* Read-only token box */}
                             <div className="flex items-center gap-2 bg-white rounded-xl border border-gray-200 px-4 h-12">
-                                <span className="text-sm text-gray-500 font-mono truncate flex-1">
+                                <span className="text-sm text-gray-500 font-bakemono truncate flex-1">
                                     {manageLink}
                                 </span>
                                 <Dialog open={isRegenerateDialogOpen} onOpenChange={setIsRegenerateDialogOpen}>
