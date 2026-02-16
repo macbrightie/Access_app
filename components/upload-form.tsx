@@ -269,7 +269,7 @@ Access Team`
                         </div>
 
                         <div className="bg-[#111] rounded-xl p-6 border border-[#333] relative group">
-                            <code className="text-[#ccff00] text-xs whitespace-nowrap font-mono tracking-wide">
+                            <code className="text-[#ccff00] text-xs font-mono tracking-wide break-all whitespace-normal">
                                 {manageLink}
                             </code>
                         </div>
