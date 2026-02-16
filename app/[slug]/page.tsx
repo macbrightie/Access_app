@@ -31,7 +31,7 @@ export default async function FilePage({ params }: { params: Promise<{ slug: str
 
     // If private, show the "Cool" Private Page
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-white">
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-lg text-center space-y-8 animate-in fade-in zoom-in duration-500">
 
                 {/* Icon Wrapper */}
@@ -46,7 +46,7 @@ export default async function FilePage({ params }: { params: Promise<{ slug: str
                     <h1 className="text-4xl md:text-5xl font-normal tracking-tight text-black font-tex-gyre">
                         Access Restricted
                     </h1>
-                    <p className="text-gray-500 text-lg font-light leading-relaxed max-w-sm mx-auto">
+                    <p className="text-gray-500 text-lg font-light leading-relaxed max-w-md mx-auto">
                         This file has been made private by the owner.
                         Please reach out to them if you believe this is a mistake.
                     </p>

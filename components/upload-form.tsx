@@ -270,7 +270,7 @@ Access Team`
 
                         <div className="bg-[#111] rounded-xl p-6 border border-[#333] relative group">
                             <code className="text-[#ccff00] text-xs font-mono tracking-wide break-all whitespace-normal">
-                                {manageLink}
+                                {successData.edit_token}
                             </code>
                         </div>
                     </div>
@@ -292,7 +292,7 @@ Access Team`
                             className="rounded-full h-11 px-6 gap-2 border-gray-200 bg-white text-gray-700 hover:bg-gray-50 shadow-sm"
                         >
                             <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                                <Image src="/icons/whatsapp-sm.svg" alt="" width={16} height={16} />
+                                <Image src="/icons/logos_whatsapp-icon.svg" alt="" width={16} height={16} />
                                 <span className="text-sm font-medium">Save to whatsapp</span>
                             </a>
                         </Button>
