@@ -215,10 +215,10 @@ Access Team`
                             <Image src="/icons/link.svg" alt="" width={14} height={14} className="opacity-50" />
                         </div>
 
-                        <span className="text-sm text-gray-400 truncate text-left font-medium">
-                            Access.vercel.app/
-                            <span className="text-black bg-gray-100 px-2 py-0.5 rounded-md ml-1">{successData.slug}</span>
-                        </span>
+                        <div className="flex items-center gap-1.5 text-black font-medium text-lg tracking-tight">
+                            <span className="opacity-40 font-normal">onlyaccessme.vercel.app/</span>
+                            <span className="bg-gray-100 px-1.5 py-0.5 rounded-md">{successData.slug}</span>
+                        </div>
 
                         <div className="ml-auto pl-2">
                             <Button
@@ -352,7 +352,7 @@ Access Team`
                         </div>
 
                         {/* Domain Text */}
-                        <span className="text-sm font-medium text-gray-900">Access.vercel.app/</span>
+                        <span className="text-sm font-medium text-gray-900">onlyaccessme.vercel.app/</span>
 
                         {/* Edit Link Input */}
                         <div className="relative">

@@ -236,7 +236,7 @@ export default function ManageFilePage() {
                         </div>
 
                         <span className="text-sm text-gray-500 font-medium">
-                            Access.vercel.app/
+                            onlyaccessme.vercel.app/
                             <span className="text-black bg-gray-100 px-2 py-0.5 rounded-md ml-1">{fileData.slug}</span>
                         </span>
 
@@ -258,11 +258,11 @@ export default function ManageFilePage() {
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="item-1" className="bg-white rounded-2xl border border-gray-100 px-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
                         <AccordionTrigger className="hover:no-underline py-6">
-                            <span className="text-base font-normal text-black">Replace file</span>
+                            <span className="text-base font-normal text-black font-tex-gyre">Replace file</span>
                         </AccordionTrigger>
                         <AccordionContent className="pb-6">
                             <div className="flex items-center gap-4 bg-gray-50/50 p-4 rounded-xl border border-dashed border-gray-200">
-                                <FileIcon filename={fileData.file_path || 'file.pdf'} className="w-12 h-12" />
+                                <FileIcon filename={replacementFile ? replacementFile.name : (fileData.file_path || 'file.pdf')} className="w-12 h-12" />
                                 <div className="flex-1">
                                     <p className="text-sm font-medium text-gray-900 truncate">
                                         {replacementFile ? replacementFile.name : (fileData.file_path.split('/').pop() || 'file.pdf')}
@@ -283,7 +283,7 @@ export default function ManageFilePage() {
 
                 {/* 3. Make Link Private Switch */}
                 <div className="bg-white rounded-2xl border border-gray-100 px-6 py-6 flex items-center justify-between hover:shadow-md transition-shadow duration-300">
-                    <span className="text-base font-normal text-black">Make link private</span>
+                    <span className="text-base font-normal text-black font-tex-gyre">Make link private</span>
                     <Switch checked={isPrivate} onCheckedChange={handleTogglePrivacy} className="scale-110 data-[state=checked]:bg-black" />
                 </div>
 
@@ -292,7 +292,7 @@ export default function ManageFilePage() {
                     <AccordionItem value="item-1" className="bg-white rounded-2xl border border-gray-100 px-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
                         <AccordionTrigger className="hover:no-underline py-6">
                             <div className="flex items-center gap-2">
-                                <span className="text-base font-normal text-black">Regenerate Token</span>
+                                <span className="text-base font-normal text-black font-tex-gyre">Regenerate Token</span>
                             </div>
                         </AccordionTrigger>
                         <AccordionContent className="pb-6 space-y-4">
@@ -361,7 +361,7 @@ export default function ManageFilePage() {
                 <div className="bg-white rounded-2xl border border-gray-100 px-6 py-4 flex items-center justify-between hover:shadow-md transition-shadow duration-300 cursor-pointer">
                     <div className="flex items-center gap-3">
                         <Image src="/icons/logos_whatsapp-icon.svg" alt="" width={20} height={20} className="w-5 h-5" />
-                        <span className="text-base font-normal text-black">Save token to WhatsApp</span>
+                        <span className="text-base font-normal text-black font-tex-gyre">Save token to WhatsApp</span>
                     </div>
                     <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-green-500">
                         <ExternalLink className="w-5 h-5" />
@@ -377,7 +377,7 @@ export default function ManageFilePage() {
                         </div>
 
                         <div className="flex-1 flex items-center border border-gray-200 rounded-xl px-3 h-12 bg-white focus-within:ring-1 focus-within:ring-black transition-all">
-                            <span className="text-sm text-gray-500 mr-2">Access.vercel.app/</span>
+                            <span className="text-sm text-gray-500 mr-2">onlyaccessme.vercel.app/</span>
                             <input
                                 value={editLinkSlug}
                                 onChange={(e) => setEditLinkSlug(e.target.value)}

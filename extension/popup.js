@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const manageBtn = document.getElementById('manage-btn');
 
     // Hardcoded production URL as requested
-    const BASE_URL = 'https://access.vercel.app';
+    const BASE_URL = 'https://onlyaccessme.vercel.app';
 
     uploadBtn.addEventListener('click', function () {
         chrome.tabs.create({ url: BASE_URL });

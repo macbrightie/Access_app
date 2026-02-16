@@ -10,6 +10,8 @@ import { revalidatePath } from 'next/cache'
 
 // --- Upload Action ---
 
+// --- Upload Action ---
+
 export async function uploadFile(prevState: any, formData: FormData): Promise<FileUploadResponse> {
     try {
         const file = formData.get('file') as File
@@ -36,11 +38,11 @@ export async function uploadFile(prevState: any, formData: FormData): Promise<Fi
             return { success: false, error: 'Slug is already taken' }
         }
 
-        const path = `files/${normalizedSlug}`
-        const fileBuffer = await file.arrayBuffer()
+        // Fix: Append extension to path so icons and downloads work correctly
+        const ext = file.name.split('.').pop() || 'bin'
+        const path = `files/${normalizedSlug}.${ext}`
 
-        // Fix: Use arrayBuffer directly or Buffer if needed, usually arrayBuffer is fine for node env with native fetch
-        // but supabase-js in node might expect Buffer.
+        const fileBuffer = await file.arrayBuffer()
         const buffer = Buffer.from(fileBuffer);
 
         const { error: uploadError } = await supabaseAdmin.storage
@@ -161,7 +163,17 @@ export async function updateFileSlug(currentSlug: string, token: string, newSlug
 
     // Move file in storage
     const oldPath = record.file_path
-    const newPath = `files/${newSlug}`
+    // Preserve extension
+    const ext = oldPath.split('.').pop() || 'bin'
+    // If oldPath didn't have extension (legacy data), just use bin or try to guess? 
+    // For now assuming existing flow might create files without extension, so we just use what we found.
+    // If oldPath was 'files/foo' (no dot), splits gives ['files/foo'], pop gives 'files/foo'. That's bad.
+    // Better check:
+    const parts = oldPath.split('.')
+    const extension = parts.length > 1 ? parts.pop() : '' // If no extension, result is empty
+
+    // Construct new path. If extension exists, add it.
+    const newPath = extension ? `files/${newSlug}.${extension}` : `files/${newSlug}`
 
     const { error: moveError } = await supabaseAdmin.storage.from('files').move(oldPath, newPath)
     if (moveError) return { success: false, error: 'Failed to move file in storage' }
@@ -201,12 +213,22 @@ export async function replaceFile(slug: string, token: string, formData: FormDat
     const { data: record } = await supabaseAdmin.from('files').select('id, file_path').eq('slug', slug).eq('edit_token', token).single()
     if (!record) return { success: false, error: 'Invalid token' }
 
-    const path = record.file_path || `files/${slug}`
+    // Determine new path with correct extension
+    const ext = file.name.split('.').pop() || 'bin'
+    const newPath = `files/${slug}.${ext}`
 
     const fileBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(fileBuffer); // Fix for node environment
+
+    // We use upload with upsert. usage of upsert=true will overwrite if path matches.
+    // If path is DIFFERENT (extension changed), we simply upload new file.
+    // Ideally we should delete the old file if path changed, but to avoid 
+    // permission/error complexity we just update the pointer in DB. 
+    // Supabase storage space is usually cheap/plentiful for MVP.
+
     const { error: uploadError } = await supabaseAdmin.storage
         .from('files')
-        .upload(path, fileBuffer, {
+        .upload(newPath, buffer, {
             contentType: file.type,
             upsert: true
         })
@@ -215,8 +237,9 @@ export async function replaceFile(slug: string, token: string, formData: FormDat
         return { success: false, error: 'Upload failed' }
     }
 
-    // Update updated_at
+    // Update DB file_path and updated_at
     await supabaseAdmin.from('files').update({
+        file_path: newPath,
         updated_at: new Date().toISOString()
     }).eq('id', record.id)
 
