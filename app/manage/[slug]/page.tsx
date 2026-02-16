@@ -19,6 +19,16 @@ import { cn } from '@/lib/utils'
 import { CopyToast } from '@/components/ui/copy-toast'
 import { CustomLoader } from '@/components/ui/custom-loader'
 import { FileIcon } from '@/components/ui/file-icon'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose
+} from "@/components/ui/dialog"
 
 // Mock icons for now if not available, replacing with Lucide/Image
 // The user provided designs use specific icons. I will try to use Image if I can guess path, or Lucide as fallback.
@@ -119,12 +129,13 @@ export default function ManageFilePage() {
         }
     }
 
-    const handleRegenerateToken = async () => {
-        if (!confirm('Are you sure? The old token will stop working.')) return
+    const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false)
 
+    const handleRegenerateToken = async () => {
         setIsUpdating(true)
         const result = await regenerateFileToken(slug, token!)
         setIsUpdating(false)
+        setIsRegenerateDialogOpen(false)
 
         if (result.success) {
             // Update URL with new token
@@ -196,7 +207,7 @@ export default function ManageFilePage() {
 
     const fullPublicLink = `${window.location.origin}/${fileData.slug}`
     const manageLink = `${window.location.origin}/manage/${fileData.slug}?token=${token}`
-    const whatsappText = `Here is your token: ${token}`
+    const whatsappText = `here is your new token: ${token}`
     const whatsappLink = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`
 
     return (
@@ -290,9 +301,36 @@ export default function ManageFilePage() {
                                 <span className="text-sm text-gray-500 font-mono truncate flex-1">
                                     {manageLink}
                                 </span>
-                                <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-transparent" onClick={handleRegenerateToken} disabled={isUpdating}>
-                                    <RefreshCw className={cn("w-4 h-4 text-gray-400", isUpdating && "animate-spin")} />
-                                </Button>
+                                <Dialog open={isRegenerateDialogOpen} onOpenChange={setIsRegenerateDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button size="icon" variant="ghost" className="h-8 w-8 hover:bg-transparent" disabled={isUpdating}>
+                                            <RefreshCw className={cn("w-4 h-4 text-gray-400", isUpdating && "animate-spin")} />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-md bg-white border-gray-100 rounded-3xl p-6">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-normal text-black">Regenerate Token?</DialogTitle>
+                                            <DialogDescription className="text-gray-500">
+                                                This will invalidate your current token immediately. You will need the new token to manage this file in the future.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter className="flex gap-2 sm:justify-end mt-4">
+                                            <DialogClose asChild>
+                                                <Button type="button" variant="ghost" className="rounded-full text-gray-500">
+                                                    Cancel
+                                                </Button>
+                                            </DialogClose>
+                                            <Button
+                                                type="button"
+                                                onClick={handleRegenerateToken}
+                                                className="rounded-full bg-red-500 hover:bg-red-600 text-white"
+                                                disabled={isUpdating}
+                                            >
+                                                {isUpdating ? 'Regenerating...' : 'Yes, regenerate'}
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
 
                             {/* Action Buttons Row */}

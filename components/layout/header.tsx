@@ -1,14 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { CopyToast } from '@/components/ui/copy-toast'
 
 export function Header() {
     const pathname = usePathname()
     const isManagePage = pathname === '/manage-access'
+
+    const [showToast, setShowToast] = useState(false)
 
     return (
         <header className="fixed top-0 w-full flex items-center justify-between px-6 py-6 bg-transparent z-50">
@@ -28,11 +32,21 @@ export function Header() {
                     <Image src="/icons/managefile.svg" alt="" width={16} height={16} className={cn("w-4 h-4", isManagePage && "opacity-30")} />
                     Manage file
                 </Link>
-                <Button variant="outline" className="rounded-full gap-2 text-sm font-normal px-4 py-2 border-gray-200 shadow-sm hover:bg-gray-50 bg-white">
+                <Button
+                    variant="outline"
+                    className="rounded-full gap-2 text-sm font-normal px-4 py-2 border-gray-200 shadow-sm hover:bg-gray-50 bg-white"
+                    onClick={() => setShowToast(true)}
+                >
                     <Image src="/icons/Chrome.svg" alt="" width={16} height={16} className="w-4 h-4" />
                     Install Extension
                 </Button>
             </div>
+
+            <CopyToast
+                show={showToast}
+                message="Coming soon! This extension will be live in a few days."
+                onClose={() => setShowToast(false)}
+            />
         </header>
     )
 }

@@ -242,7 +242,7 @@ Access Team`
                             <p className="text-gray-400 text-xs">Losing it means you cannot manage this file.</p>
                         </div>
 
-                        <div className="bg-[#111] rounded-xl p-4 border border-[#333] relative group">
+                        <div className="bg-[#111] rounded-xl p-6 border border-[#333] relative group">
                             <code className="text-[#ccff00] text-xs whitespace-nowrap font-mono tracking-wide">
                                 {manageLink}
                             </code>

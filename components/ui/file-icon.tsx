@@ -63,7 +63,7 @@ export function FileIcon({ filename, className }: FileIconProps) {
         return (
             <div className={cn("relative flex items-center justify-center select-none", className)}>
                 <Image
-                    src={`/fileformats/${iconName}`}
+                    src={`/fileFormats/${iconName}`}
                     alt={ext}
                     fill
                     className="object-contain"
