@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { generateSlug, isValidSlug, MAX_SLUG_LENGTH } from '@/lib/slug-utils'
-import { uploadFile, checkSlugAvailability } from '@/app/actions'
+import { prepareUpload, completeUpload, checkSlugAvailability } from '@/app/actions'
 import { FileUploadResponse } from '@/types/file'
 import { AlertTriangle, ArrowLeft, FileUp } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -70,26 +70,22 @@ export default function UploadForm() {
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
 
-        if (slugAvailability === 'checking') {
-            // wait or return? 
-            return
-        }
+        if (slugAvailability === 'checking') return
 
         setError(null)
         setSuccessData(null)
         setProgress(0)
 
-        // Manual validations using State
         if (!file) {
             setError('Please select a file')
             return
         }
+        // Increased limit to 50MB (or more since it's direct to Supabase)
         if (file.size > 50 * 1024 * 1024) {
             setError('File is too large (max 50MB)')
             return
         }
 
-        // Strict Requirement: User MUST edit URL
         if (!slug || slug.trim() === '') {
             setError('You have to edit your URL before uploading the file')
             return
@@ -105,38 +101,68 @@ export default function UploadForm() {
             return
         }
 
-        // Simulate Progress
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 90) return 90
-                const inc = prev < 50 ? 5 : 2
-                return prev + inc
-            })
-        }, 100)
-
+        // --- NEW UPLOAD FLOW ---
         try {
-            const formData = new FormData()
-            formData.append('file', file)
-            formData.append('slug', slug)
+            // 1. Prepare Upload (Get Signed URL)
+            // progress: 10%
+            setProgress(10)
+            const prep = await prepareUpload(slug, file.name, file.type)
 
-            const result = await uploadFile(null, formData)
+            if (!prep.success || !prep.signedUrl || !prep.path) {
+                setError(prep.error || 'Failed to prepare upload')
+                setProgress(0)
+                return
+            }
 
-            clearInterval(interval)
-            setProgress(100)
+            // 2. Upload to Supabase (Client Side)
+            // Simulate progress for now, or use XHR for real progress
+            // setting to 30% start
+            setProgress(30)
 
-            // Slight delay to show 100% before transitioning
-            await new Promise(r => setTimeout(r, 400))
+            // XHR allows tracking upload progress
+            await new Promise<void>((resolve, reject) => {
+                const xhr = new XMLHttpRequest()
+                xhr.open('PUT', prep.signedUrl, true)
+                xhr.setRequestHeader('Content-Type', file.type)
+
+                xhr.upload.onprogress = (event) => {
+                    if (event.lengthComputable) {
+                        const percentComplete = (event.loaded / event.total) * 60 // Max 60% for upload phase (30->90)
+                        setProgress(30 + percentComplete)
+                    }
+                }
+
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        resolve()
+                    } else {
+                        reject(new Error(`Upload failed with status ${xhr.status}`))
+                    }
+                }
+
+                xhr.onerror = () => reject(new Error('Network error during upload'))
+                xhr.send(file)
+            })
+
+            setProgress(90)
+
+            // 3. Complete Upload (Save DB Record)
+            const result = await completeUpload(slug, prep.path)
 
             if (result.success) {
-                setSuccessData(result)
+                setProgress(100)
+                // Slight delay to visualize 100%
+                await new Promise(r => setTimeout(r, 400))
+                setSuccessData(result as FileUploadResponse)
             } else {
-                setError(result.error || 'Something went wrong')
+                setError(result.error || 'Failed to finish upload')
                 setProgress(0)
             }
-        } catch (err) {
-            clearInterval(interval)
+
+        } catch (err: any) {
+            console.error(err)
             setProgress(0)
-            setError('Network error or server failed')
+            setError(err.message || 'Something went wrong')
         }
     }
 

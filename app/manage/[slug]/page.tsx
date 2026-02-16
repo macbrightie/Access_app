@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams, useParams } from 'next/navigation'
-import { getFileDetails, toggleFilePrivacy, updateFileSlug, regenerateFileToken, replaceFile } from '@/app/actions'
+import { getFileDetails, toggleFilePrivacy, updateFileSlug, regenerateFileToken, prepareReplace, completeReplace } from '@/app/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
@@ -157,19 +157,47 @@ export default function ManageFilePage() {
         if (!replacementFile) return
 
         setIsUpdating(true)
-        const formData = new FormData()
-        formData.append('file', replacementFile)
 
-        const result = await replaceFile(slug, token!, formData)
-        setIsUpdating(false)
+        try {
+            // 1. Prepare
+            const prep = await prepareReplace(slug, token!, replacementFile.name, replacementFile.type)
+            if (!prep.success || !prep.signedUrl || !prep.path) {
+                setError(prep.error || 'Failed to prepare upload')
+                setIsUpdating(false)
+                return
+            }
 
-        if (result.success) {
-            setReplacementFile(null)
-            setToastMessage('File updated successfully')
-            setShowToast(true)
-            router.refresh()
-        } else {
-            setError(result.error || 'Failed to replace file')
+            // 2. Upload (Client Side)
+            await new Promise<void>((resolve, reject) => {
+                const xhr = new XMLHttpRequest()
+                xhr.open('PUT', prep.signedUrl, true)
+                xhr.setRequestHeader('Content-Type', replacementFile.type)
+                xhr.onload = () => {
+                    if (xhr.status === 200) resolve()
+                    else reject(new Error(`Upload failed: ${xhr.status}`))
+                }
+                xhr.onerror = () => reject(new Error('Network error'))
+                xhr.send(replacementFile)
+            })
+
+            // 3. Complete
+            const result = await completeReplace(slug, token!, prep.path)
+
+            setIsUpdating(false)
+
+            if (result.success) {
+                setReplacementFile(null)
+                setToastMessage('File updated successfully')
+                setShowToast(true)
+                router.refresh()
+            } else {
+                setError(result.error || 'Failed to complete update')
+            }
+
+        } catch (err: any) {
+            console.error(err)
+            setIsUpdating(false)
+            setError(err.message || 'Update failed')
         }
     }
 

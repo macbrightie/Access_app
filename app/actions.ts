@@ -10,16 +10,10 @@ import { revalidatePath } from 'next/cache'
 
 // --- Upload Action ---
 
-// --- Upload Action ---
+// --- Upload Actions (Signed URL Flow) ---
 
-export async function uploadFile(prevState: any, formData: FormData): Promise<FileUploadResponse> {
+export async function prepareUpload(slug: string, fileName: string, fileType: string) {
     try {
-        const file = formData.get('file') as File
-        const slug = formData.get('slug') as string
-
-        if (!file) return { success: false, error: 'No file provided' }
-        if (file.size > 50 * 1024 * 1024) return { success: false, error: 'File too large (max 50MB)' }
-
         if (!slug) return { success: false, error: 'Slug is required' }
         const normalizedSlug = slug.toLowerCase()
 
@@ -27,37 +21,55 @@ export async function uploadFile(prevState: any, formData: FormData): Promise<Fi
             return { success: false, error: 'Invalid slug. Use lowercase letters, numbers, and hyphens only. Min 4 chars.' }
         }
 
-        const { data: existing, error: checkError } = await supabaseAdmin
+        // 1. Check if slug exists in DB
+        const { data: existing } = await supabaseAdmin
             .from('files')
             .select('id')
             .eq('slug', normalizedSlug)
             .single()
 
-        // Single() returns error if no rows found, specifically code 'PGRST116'
         if (existing) {
             return { success: false, error: 'Slug is already taken' }
         }
 
-        // Fix: Append extension to path so icons and downloads work correctly
-        const ext = file.name.split('.').pop() || 'bin'
+        // 2. Generate Path
+        const ext = fileName.split('.').pop() || 'bin'
         const path = `files/${normalizedSlug}.${ext}`
 
-        const fileBuffer = await file.arrayBuffer()
-        const buffer = Buffer.from(fileBuffer);
-
-        const { error: uploadError } = await supabaseAdmin.storage
+        // 3. Generate Signed Upload URL
+        // invalidates in 60 seconds * 2 = 2 minutes
+        const { data, error } = await supabaseAdmin.storage
             .from('files')
-            .upload(path, buffer, {
-                contentType: file.type,
-                upsert: true
-            })
+            .createSignedUploadUrl(path)
 
-        if (uploadError) {
-            console.error('Supabase Upload Error:', uploadError)
-            return { success: false, error: `Upload failed: ${uploadError.message}` }
+        if (error || !data) {
+            console.error('Signed URL Error:', error)
+            return { success: false, error: 'Failed to generate upload URL' }
         }
 
+        return {
+            success: true,
+            signedUrl: data.signedUrl,
+            path: path,
+            token: data.token // Supabase token, not our edit token
+        }
+
+    } catch (error: any) {
+        console.error('Prepare Upload Error:', error)
+        return { success: false, error: error.message }
+    }
+}
+
+export async function completeUpload(slug: string, path: string) {
+    try {
+        const normalizedSlug = slug.toLowerCase()
+
+        // Double check slug availability (race condition prev)
+        const { data: existing } = await supabaseAdmin.from('files').select('id').eq('slug', normalizedSlug).single()
+        if (existing) return { success: false, error: 'Slug was taken during upload' }
+
         const editToken = generateToken()
+
         const { error: dbError } = await supabaseAdmin
             .from('files')
             .insert({
@@ -68,18 +80,19 @@ export async function uploadFile(prevState: any, formData: FormData): Promise<Fi
             })
 
         if (dbError) {
-            console.error('Supabase DB Insert Error:', dbError)
-            return { success: false, error: `Database save failed: ${dbError.message}` }
+            console.error('DB Insert Error:', dbError)
+            return { success: false, error: 'Failed to save file record' }
         }
 
         return { success: true, slug: normalizedSlug, edit_token: editToken }
+
     } catch (error: any) {
-        console.error('Server Action Error:', error)
-        return { success: false, error: `Server error: ${error.message || 'Unknown error'}` }
+        console.error('Complete Upload Error:', error)
+        return { success: false, error: error.message }
     }
 }
 
-// --- Check Action ---
+// Keeping checkSlugAvailability as is
 export async function checkSlugAvailability(slug: string) {
     if (!slug) return { available: false, error: 'Empty slug' }
     const normalizedSlug = slug.toLowerCase()
@@ -205,43 +218,51 @@ export async function regenerateFileToken(slug: string, token: string) {
     return { success: true, newToken }
 }
 
-export async function replaceFile(slug: string, token: string, formData: FormData) {
-    const file = formData.get('file') as File
-    if (!file) return { success: false, error: 'No file provided' }
+export async function prepareReplace(slug: string, token: string, fileName: string, fileType: string) {
+    try {
+        // Verify token
+        const { data: record } = await supabaseAdmin.from('files').select('id, file_path').eq('slug', slug).eq('edit_token', token).single()
+        if (!record) return { success: false, error: 'Invalid token' }
 
-    // Verify token
-    const { data: record } = await supabaseAdmin.from('files').select('id, file_path').eq('slug', slug).eq('edit_token', token).single()
-    if (!record) return { success: false, error: 'Invalid token' }
+        // Determine new path with correct extension
+        const ext = fileName.split('.').pop() || 'bin'
+        const newPath = `files/${slug}.${ext}`
 
-    // Determine new path with correct extension
-    const ext = file.name.split('.').pop() || 'bin'
-    const newPath = `files/${slug}.${ext}`
+        // Generate Signed Upload URL
+        const { data, error } = await supabaseAdmin.storage
+            .from('files')
+            .createSignedUploadUrl(newPath)
 
-    const fileBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(fileBuffer); // Fix for node environment
+        if (error || !data) {
+            return { success: false, error: 'Failed to generate upload URL' }
+        }
 
-    // We use upload with upsert. usage of upsert=true will overwrite if path matches.
-    // If path is DIFFERENT (extension changed), we simply upload new file.
-    // Ideally we should delete the old file if path changed, but to avoid 
-    // permission/error complexity we just update the pointer in DB. 
-    // Supabase storage space is usually cheap/plentiful for MVP.
-
-    const { error: uploadError } = await supabaseAdmin.storage
-        .from('files')
-        .upload(newPath, buffer, {
-            contentType: file.type,
-            upsert: true
-        })
-
-    if (uploadError) {
-        return { success: false, error: 'Upload failed' }
+        return {
+            success: true,
+            signedUrl: data.signedUrl,
+            path: newPath
+        }
+    } catch (error: any) {
+        return { success: false, error: error.message }
     }
+}
 
-    // Update DB file_path and updated_at
-    await supabaseAdmin.from('files').update({
-        file_path: newPath,
-        updated_at: new Date().toISOString()
-    }).eq('id', record.id)
+export async function completeReplace(slug: string, token: string, path: string) {
+    try {
+        // Verify token
+        const { data: record } = await supabaseAdmin.from('files').select('id').eq('slug', slug).eq('edit_token', token).single()
+        if (!record) return { success: false, error: 'Invalid token' }
 
-    return { success: true }
+        // Update DB file_path and updated_at
+        const { error } = await supabaseAdmin.from('files').update({
+            file_path: path,
+            updated_at: new Date().toISOString()
+        }).eq('id', record.id)
+
+        if (error) return { success: false, error: 'Failed to update file record' }
+
+        return { success: true }
+    } catch (error: any) {
+        return { success: false, error: error.message }
+    }
 }
