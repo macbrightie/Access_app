@@ -258,21 +258,21 @@ export default function ManageFilePage() {
 
                 {/* 1. Public Link Display */}
                 <div className="flex justify-center mb-8">
-                    <div className="flex items-center gap-3 bg-white rounded-full border border-gray-200 p-1 pl-4 pr-1 w-auto hover:shadow-md transition-shadow duration-300">
+                    <div className="flex items-center gap-3 bg-white rounded-full border border-gray-200 p-1 pl-4 pr-1 w-full max-w-md mx-auto hover:shadow-md transition-shadow duration-300">
                         <div className="w-8 h-8 flex items-center justify-center bg-gray-50 rounded-full">
                             <Image src="/icons/link.svg" alt="" width={14} height={14} className="opacity-50" />
                         </div>
 
-                        <span className="text-sm text-gray-500 font-medium">
-                            onlyaccessme.vercel.app/
-                            <span className="text-black bg-gray-100 px-2 py-0.5 rounded-md ml-1">{fileData.slug}</span>
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0 overflow-hidden text-sm md:text-base text-gray-500 font-medium">
+                            <span className="shrink-0 truncate max-w-[120px] md:max-w-none">onlyaccessme.vercel.app/</span>
+                            <span className="text-black bg-gray-100 px-2 py-0.5 rounded-md truncate">{fileData.slug}</span>
+                        </div>
 
-                        <div className="ml-2">
+                        <div className="ml-auto pl-2">
                             <Button
                                 size="icon"
                                 variant="ghost"
-                                className="rounded-full h-10 w-10 hover:bg-gray-50 border border-gray-200"
+                                className="rounded-full h-10 w-10 hover:bg-gray-50 border border-gray-200 shrink-0"
                                 onClick={() => handleCopy(fullPublicLink, 'Link')}
                             >
                                 <Image src="/icons/file-copy-big.svg" alt="Copy" width={20} height={20} className="w-5 h-5" />

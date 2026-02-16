@@ -242,7 +242,7 @@ Access Team`
                         </div>
 
                         <div className="flex items-center gap-1.5 text-black font-medium text-base md:text-lg tracking-tight overflow-hidden">
-                            <span className="opacity-40 font-normal shrink-0">onlyaccessme.vercel.app/</span>
+                            <span className="opacity-40 font-normal shrink-0 truncate max-w-[120px] md:max-w-none">onlyaccessme.vercel.app/</span>
                             <span className="bg-gray-100 px-1.5 py-0.5 rounded-md truncate">{successData.slug}</span>
                         </div>
 
